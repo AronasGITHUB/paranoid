@@ -1,0 +1,5 @@
+# Ignore useless backup files
+*.un
+*.bak
+*~
+
