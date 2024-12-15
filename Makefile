@@ -3,8 +3,8 @@ BIN_DIR=/usr/local/bin
 MAN_DIR=/usr/share/man/man1
 MAN_PAGE=paranoid.1
 SCRIPT=paranoid
-INSTALL_URL="URL_to_download_paranoid_script"
-MAN_PAGE_URL="URL_to_download_man_page"
+INSTALL_URL="https://raw.githubusercontent.com/AronasGITHUB/paranoid/refs/heads/main/paranoid"
+MAN_PAGE_URL="https://raw.githubusercontent.com/AronasGITHUB/paranoid/refs/heads/main/paranoid.1"
 
 # Declare phony targets
 .PHONY: all install uninstall help
