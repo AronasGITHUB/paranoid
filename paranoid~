@@ -1,0 +1,103 @@
+#!/bin/bash
+
+# Paranoid - A program that automatically verifies files for paranoid people
+
+if [ -z "$1" ]; then
+    echo -e "\e[1m[i] Usage: paranoid <file>\e[0m"
+    echo -e "\e[1m[i] Paranoid is a program that automatically verifies files.\e[0m"
+else
+    echo -e "\e[1m[i] Searching if file exists..\e[0m"
+
+    if [ -e "$1" ]; then
+        echo -e "\e[42[+] File exists.\e[42m"
+        
+        if [ -d "$1" ]; then
+            echo -e "[x] The file you provided is a directory. Closing"
+            exit 1
+        else
+            :
+        fi
+    fi
+
+    echo "--- Verification Activity ---"
+
+    sha256sum "$1.sha256" > /dev/null 2>&1
+    sha256sum "sha256sums.txt" > /dev/null 2>&1
+
+    if [ ! -e "$1.sha256" ]; then
+        echo -e "[!] WARNING - Possibly missing sha256sum files"
+    else
+        :
+    fi
+
+    if [ ! -e "sha256sums.txt" ]; then
+        echo -e "[!] WARNING - Possibly missing sha256sum files"
+    else
+        :
+    fi
+    
+    if [ $? -eq 0 ]; then
+        echo -e "[+] Verified sha256sum."
+    else
+        echo -e "[x] The sha256sum appears invalid, or non-existent."
+    fi
+
+    sha512sum "$1.sha512" > /dev/null 2>&1
+    sha512sum "sha512sums.txt" > /dev/null 2>&1
+
+    if [ ! -e "$1.sha512" ]; then
+        echo -e "[!] WARNING - Possibly missing sha512sum files"
+    else
+        :
+    fi
+    
+    if [ ! -e "sha512sums.txt" ]; then
+        echo -e "[!] WARNING - Possibly missing sha512sum files"
+    else
+        :
+    fi
+
+    if [ $? -eq 0 ]; then
+        echo -e "[+] Verified sha512sum."
+    else
+        echo -e "[x] The sha512sum appears invalid, or non-existent."
+    fi
+
+    gpg --verify "$1.sig" > /dev/null 2>&1
+    gpg --keyserver-options auto-key-retrieve --verify "$1.sig" > /dev/null 2>&1
+
+    if [ ! -e "$1.sig" ]; then
+        gpg --verify "$1.gpg" > /dev/null 2>&1
+        gpg --keyserver-options auto-key-retrieve --verify "$1.gpg" > /dev/null 2>&1
+
+        if [ ! -e "$1.gpg" ]; then
+            echo -e "[!] WARNING - Possibly missing gpg files"
+        else
+            :
+        fi
+    fi
+
+    if [ $? -eq 0 ]; then
+        echo -e "[+] Verified gpg."
+    else
+        echo -e "[x] The gpg appears invalid or non existent."
+    fi
+
+    openssl dgst -sha256 "$1.sha256" > /dev/null 2>&1
+    openssl dgst -sha256 "sha256sums.txt" > /dev/null 2>&1
+
+    if [ ! -e "$1.sha256" ]; then
+        echo -e "[!] WARNING - Possibly missing sha256 files."
+    else
+        :
+    fi
+
+    if [ $? -eq 0 ]; then
+        echo -e "[+] Verified sha256 with openssl"
+    else
+        echo -e "[x] Openssl appears invalid or the file appears nonexistent."
+    fi
+
+    echo "--- Result ---"
+    echo "Verification finished!"
+fi

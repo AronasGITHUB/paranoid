@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# Paranoid - A program that automatically verifies files for paranoid people
+
+if [ -z "$1" ]; then
+    echo -e "\e[1m[i] Usage: paranoid <file>\e[0m"
+    echo -e "\e[1m[i] Paranoid is a program that automatically verifies files.\e[0m"
+    exit 1
+else
+    echo -e "\e[1m[i] Searching if file exists..\e[0m"
+
+    # Check if file exists
+    if [ ! -e "$1" ]; then
+        echo -e "\e[1m\e[91m[x] The file does not exist: $1\e[0m"
+        exit 1
+    fi
+
+    # Check if file is a directory
+    if [ -d "$1" ]; then
+        echo -e "\e[1m\e[91m[x] The file you provided is a directory. Closing\e[0m"
+        exit 1
+    fi
+
+    echo -e "\e[1m\e[92m[+] File exists.\e[0m"
+    
+    echo "--- Verification Activity ---"
+
+    # Check if sha256sum files exist
+    if [ ! -e "$1.sha256" ]; then
+        echo -e "\e[1m\e[93m[!] WARNING - Missing sha256sum file: $1.sha256\e[0m"
+    else
+        sha256sum "$1.sha256" > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo -e "\e[1m\e[92m[+] Verified sha256sum.\e[0m"
+        else
+            echo -e "\e[1m\e[91m[x] Invalid sha256sum file: $1.sha256\e[0m"
+        fi
+    fi
+
+    if [ ! -e "sha256sums.txt" ]; then
+        echo -e "\e[1m\e[93m[!] WARNING - Missing sha256sums.txt\e[0m"
+    else
+        sha256sum "sha256sums.txt" > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo -e "\e[1m\e[92m[+] Verified sha256sums.txt.\e[0m"
+        else
+            echo -e "\e[1m\e[91m[x] Invalid sha256sums.txt\e[0m"
+        fi
+    fi
+
+    # Check if sha512sum files exist
+    if [ ! -e "$1.sha512" ]; then
+        echo -e "\e[1m\e[93m[!] WARNING - Missing sha512sum file: $1.sha512\e[0m"
+    else
+        sha512sum "$1.sha512" > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo -e "\e[1m\e[92m[+] Verified sha512sum.\e[0m"
+        else
+            echo -e "\e[1m\e[91m[x] Invalid sha512sum file: $1.sha512\e[0m"
+        fi
+    fi
+
+    if [ ! -e "sha512sums.txt" ]; then
+        echo -e "\e[1m\e[93m[!] WARNING - Missing sha512sums.txt\e[0m"
+    else
+        sha512sum "sha512sums.txt" > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo -e "\e[1m\e[92m[+] Verified sha512sums.txt.\e[0m"
+        else
+            echo -e "\e[1m\e[91m[x] Invalid sha512sums.txt\e[0m"
+        fi
+    fi
+
+    # Check if GPG files exist and verify
+    if [ ! -e "$1.sig" ] && [ ! -e "$1.gpg" ]; then
+        echo -e "\e[1m\e[93m[!] WARNING - Missing GPG files ($1.sig or $1.gpg)\e[0m"
+    else
+        if [ -e "$1.sig" ]; then
+            gpg --verify "$1.sig" > /dev/null 2>&1
+            if [ $? -eq 0 ]; then
+                echo -e "\e[1m\e[92m[+] Verified GPG signature ($1.sig).\e[0m"
+            else
+                echo -e "\e[1m\e[91m[x] Invalid GPG signature: $1.sig\e[0m"
+            fi
+        fi
+        if [ -e "$1.gpg" ]; then
+            gpg --verify "$1.gpg" > /dev/null 2>&1
+            if [ $? -eq 0 ]; then
+                echo -e "\e[1m\e[92m[+] Verified GPG signature ($1.gpg).\e[0m"
+            else
+                echo -e "\e[1m\e[91m[x] Invalid GPG signature: $1.gpg\e[0m"
+            fi
+        fi
+    fi
+
+    # Check OpenSSL sha256
+    if [ ! -e "$1.sha256" ]; then
+        echo -e "\e[1m\e[93m[!] WARNING - Missing sha256 file: $1.sha256\e[0m"
+    else
+        openssl dgst -sha256 "$1.sha256" > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo -e "\e[1m\e[92m[+] Verified sha256sum with OpenSSL.\e[0m"
+        else
+            echo -e "\e[1m\e[91m[x] Invalid sha256sum file with OpenSSL: $1.sha256\e[0m"
+        fi
+    fi
+
+    echo "--- Result ---"
+    echo "Verification finished!"
+fi
