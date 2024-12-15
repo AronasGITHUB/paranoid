@@ -14,4 +14,4 @@ We understand you want to contribute to us. So please follow our basic rules.
 1. Respect the privacy of others
 2. Do not harass the project or abuse it in any way
 3. Follow our licenses
-4. You remember you are involved and responsible for the contributions you done.
+4. You remember you are involved and responsible for the contributions you do.
